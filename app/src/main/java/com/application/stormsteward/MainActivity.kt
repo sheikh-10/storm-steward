@@ -11,8 +11,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.application.stormsteward.ui.theme.StormStewardTheme
+import android.media.MediaPlayer
+import androidx.activity.viewModels
+import androidx.lifecycle.coroutineScope
+import com.application.stormsteward.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
+import com.application.stormsteward.viewmodel.HomeViewModel.Companion
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
+
+    private var mediaPlayer: MediaPlayer? = null
+    private val viewModel: HomeViewModel by viewModels(factoryProducer = { HomeViewModel.Factory })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -26,5 +37,43 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun startMediaPlayer() {
+        mediaPlayer = MediaPlayer.create(this@MainActivity, R.raw.bg)
+        mediaPlayer?.let {
+            it.isLooping = true
+            it.setVolume(100f, 100f)
+
+            if (!it.isPlaying) {
+                it.start()
+            }
+        }
+    }
+
+    private fun stopMediaPlayer() {
+        mediaPlayer?.let {
+                it.stop()
+                it.release()
+            }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        lifecycle.coroutineScope.launch {
+            delay(1_000L)
+            viewModel.uiState.collect {
+                if (it.isSoundOn) {
+                    startMediaPlayer()
+                } else {
+                    stopMediaPlayer()
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopMediaPlayer()
     }
 }

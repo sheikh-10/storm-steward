@@ -27,7 +27,11 @@ import com.application.stormsteward.R
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, onPlayClick: () -> Unit = {}) {
+fun HomeScreen(modifier: Modifier = Modifier,
+               onPlayClick: () -> Unit = {},
+               soundState: Boolean = true,
+               onSoundClick: () -> Unit = {}
+               ) {
     Box(modifier = modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.game_bg),
@@ -57,19 +61,22 @@ fun HomeScreen(modifier: Modifier = Modifier, onPlayClick: () -> Unit = {}) {
                 contentDescription = null,
                 modifier = modifier
                     .padding(bottom = 50.dp)
-                    .size(120.dp).clickable(onClick = onPlayClick),
+                    .size(120.dp)
+                    .clickable(onClick = onPlayClick),
                 contentScale = ContentScale.Crop
                 )
 
+            IconButton(
+                onClick = onSoundClick,
+                modifier = modifier.padding(bottom = 50.dp)) {
 
-            Image(painter = painterResource(id = R.drawable.sound_on),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color =  Color(0xFF255A89)),
-                modifier = modifier
-                    .padding(bottom = 50.dp)
-                    .size(80.dp),
-                contentScale = ContentScale.Crop)
-
+                Image(painter = if (soundState) painterResource(id = R.drawable.sound_on) else painterResource(id = R.drawable.sound_off),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color =  Color(0xFF255A89)),
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier.size(80.dp)
+                    )
+            }
         }
     }
 }
